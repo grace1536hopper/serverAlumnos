@@ -18,7 +18,6 @@ const datosMedicos_1 = __importDefault(require("../models/datosMedicos"));
 const direccion_1 = __importDefault(require("../models/direccion"));
 const escolaridad_1 = __importDefault(require("../models/escolaridad"));
 const tutor_1 = __importDefault(require("../models/tutor"));
-const tramites_1 = __importDefault(require("../models/tramites"));
 const semestre_1 = require("../models/semestre");
 // import Direccion from '../models/direccion';
 const getAlumnos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -28,17 +27,65 @@ const getAlumnos = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     });
 });
 exports.getAlumnos = getAlumnos;
+// export const getAlumno = async (req: Request, res: Response) => {
+//   try {
+//     const { id } = req.params;
+//     const usuario = await Alumno.findAll(id, {
+//      // include: [
+//          include: [
+//           {model: DatosMedicos},
+//           {model:Direccion }, 
+//           {model:Escolaridad}, 
+//           {model:PadreTutor},
+//           {model:Tramites},
+//           {model:EstadoGeneral,include: [
+//             {
+//               model: Carrera,
+//               include:[
+//               {model: Asignaturas,include: [
+//                 {
+//                   model: Grupo,include: [
+//                     {
+//                       model: Semestre,
+//                     },],
+//                 },
+//               ],
+//               }
+//               ],
+//             },
+//           ],
+//          },
+//           {model:DatosAcademicos,
+//             include: [            
+//             {model:Kardex},
+//              {model:Carrera},            
+//           ],
+//           }
+//         ],
+//     });
+//     if (usuario) {
+//       res.json(usuario);
+//     } else {
+//       res.status(404).json({
+//         msg: `No existe el usuario con el id ${id}`,
+//       });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       msg: 'Ocurrió un error, comuníquese con soporte',
+//     });
+//   }
+// }
 const getAlumno = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
         const usuario = yield semestre_1.Alumno.findByPk(id, {
-            // include: [
             include: [
                 { model: datosMedicos_1.default },
                 { model: direccion_1.default },
                 { model: escolaridad_1.default },
                 { model: tutor_1.default },
-                { model: tramites_1.default },
                 { model: semestre_1.EstadoGeneral, include: [
                         {
                             model: semestre_1.Carrera,
@@ -52,22 +99,27 @@ const getAlumno = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                                             ],
                                         },
                                     ],
-                                }
+                                },
                             ],
                         },
                     ],
                 },
-                { model: semestre_1.DatosAcademicos,
-                    include: [
+                { model: semestre_1.DatosAcademicos, include: [
                         { model: semestre_1.Kardex },
                         { model: semestre_1.Carrera },
                     ],
                 },
-                { model: semestre_1.ingreso },
             ],
-            // ],
         });
         if (usuario) {
+            const tramites = yield usuario.getTramites();
+            usuario.setDataValue('Tramites', tramites);
+            const datosAcademicos = yield semestre_1.DatosAcademicos.findByPk(id);
+            const kardexes = yield datosAcademicos.getKardexes();
+            datosAcademicos.setDataValue('Kardexes', kardexes);
+            const carreras = yield semestre_1.Carrera.findByPk(id); //Suponiendo que Carrera está asociada directamente con EstadoGeneral
+            const asignaturas = yield carreras.getAsignaturas();
+            carreras.setDataValue('Asignaturas', asignaturas);
             res.json(usuario);
         }
         else {

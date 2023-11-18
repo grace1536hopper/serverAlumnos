@@ -83,7 +83,6 @@ Alumno.belongsTo(Direccion, { foreignKey: 'idDireccion' });
 Alumno.belongsTo(Escolaridad, { foreignKey: 'idEscolaridad' });
 Alumno.belongsTo(PadreTutor, { foreignKey: 'idTutor' });
 Alumno.belongsTo(Tramites, { foreignKey: 'idTramites' });
-// Alumno.belongsTo(EstadoGeneral, { foreignKey: 'idEstadoGeneral' });
-// Alumno.belongsTo(DatosAcademicos, { foreignKey: 'idDatoAcademico' });
+
 
 export default Alumno;

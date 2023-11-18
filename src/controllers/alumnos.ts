@@ -5,7 +5,7 @@ import Direccion from "../models/direccion"
 import Escolaridad from "../models/escolaridad"
 import PadreTutor from "../models/tutor"
 import Tramites from "../models/tramites"
-import { Semestre, Grupo, Asignaturas, Calificaciones, Carrera, Kardex, EstadoGeneral, DatosAcademicos, Alumno, ingreso} from '../models/semestre';
+import { Semestre, Grupo, Asignaturas, Calificaciones, Carrera, Kardex, EstadoGeneral, DatosAcademicos, Alumno} from '../models/semestre';
 import { Model } from "sequelize"
 
 // import Direccion from '../models/direccion';
@@ -20,52 +20,110 @@ export const getAlumnos = async (req:Request, res:Response) =>{
 }
 
 
+// export const getAlumno = async (req: Request, res: Response) => {
+//   try {
+//     const { id } = req.params;
+//     const usuario = await Alumno.findAll(id, {
+//      // include: [
+//          include: [
+//           {model: DatosMedicos},
+//           {model:Direccion }, 
+//           {model:Escolaridad}, 
+//           {model:PadreTutor},
+//           {model:Tramites},
+//           {model:EstadoGeneral,include: [
+//             {
+//               model: Carrera,
+//               include:[
+//               {model: Asignaturas,include: [
+//                 {
+//                   model: Grupo,include: [
+//                     {
+//                       model: Semestre,
+//                     },],
+//                 },
+//               ],
+//               }
+                
+//               ],
+//             },
+//           ],
+//          },
+//           {model:DatosAcademicos,
+//             include: [            
+//             {model:Kardex},
+//              {model:Carrera},            
+//           ],
+//           }
+          
+//         ],
+//     });
+
+//     if (usuario) {
+//       res.json(usuario);
+//     } else {
+//       res.status(404).json({
+//         msg: `No existe el usuario con el id ${id}`,
+//       });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       msg: 'Ocurrió un error, comuníquese con soporte',
+//     });
+//   }
+// }
 
 export const getAlumno = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const usuario = await Alumno.findByPk(id, {
-     // include: [
-         include: [
-          {model: DatosMedicos},
-          {model:Direccion }, 
-          {model:Escolaridad}, 
-          {model:PadreTutor},
-          {model:Tramites},
-          {model:EstadoGeneral,include: [
+      include: [
+        { model: DatosMedicos },
+        { model: Direccion },
+        { model: Escolaridad },
+        { model: PadreTutor },
+        
+        { model: EstadoGeneral, include: [
             {
-              model: Carrera,
-              include:[
-              {model: Asignaturas,include: [
-                {
-                  model: Grupo,include: [
+               model: Carrera ,
+              include: [
+                { model: Asignaturas, include: [
                     {
-                      model: Semestre,
-                    },],
+                      model: Grupo, include: [
+                        {
+                          model: Semestre,
+                        },
+                      ],
+                    },
+                  ],
                 },
-              ],
-              }
-                
               ],
             },
           ],
-         },
-          {model:DatosAcademicos,
-            include: [            
-            {model:Kardex},
-             {model:Carrera},            
+        },
+        { model: DatosAcademicos, include: [            
+            { model: Kardex },
+            { model: Carrera },
           ],
-          },
-          {model:ingreso},
-          
-        ],
-
-     // ],
+        },
+      ],
     });
 
     if (usuario) {
+      const tramites = await usuario.getTramites();
+      usuario.setDataValue('Tramites', tramites);
+    
+      const datosAcademicos = await DatosAcademicos.findByPk(id);
+      const kardexes = await datosAcademicos.getKardexes();
+      datosAcademicos.setDataValue('Kardexes', kardexes);
+
+      const carreras = await Carrera.findByPk(id); //Suponiendo que Carrera está asociada directamente con EstadoGeneral
+      const asignaturas = await carreras.getAsignaturas();
+      carreras.setDataValue('Asignaturas', asignaturas);
+
       res.json(usuario);
-    } else {
+    }  else {
       res.status(404).json({
         msg: `No existe el usuario con el id ${id}`,
       });
@@ -76,7 +134,7 @@ export const getAlumno = async (req: Request, res: Response) => {
       msg: 'Ocurrió un error, comuníquese con soporte',
     });
   }
-}
+};
 
 
 export const deletAlumno = async (req:Request, res:Response) =>{

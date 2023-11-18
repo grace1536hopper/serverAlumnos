@@ -18,7 +18,4 @@ const Grupo = db.define('grupos', {
     updatedAt : false
 });
 
-// Grupo.belongsTo( Semestre , { foreignKey: 'id_semestre' });
-
-
 export default Grupo;

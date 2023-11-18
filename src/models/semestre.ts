@@ -326,36 +326,6 @@ DatosAcademicos.init(
     updatedAt: false,
   }
 );
-
-
-class ingreso extends Model {}
-
-ingreso.init(
-  {
-    idIngreso: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    boleta: {
-      type: DataTypes.DOUBLE,
-      allowNull: false,
-    },
-    contrasena: {
-      type: DataTypes.DOUBLE,
-      allowNull: false,
-    },
-    
-  },
-  {
-    sequelize: db,
-    modelName: 'ingreso',
-    createdAt: false,
-    updatedAt: false,
-  }
-);
-
  
 class Alumno extends Model {}
 
@@ -415,7 +385,7 @@ Alumno.init(
       allowNull: false,
     },
     boleta: {
-      type: DataTypes.STRING,
+      type: DataTypes.DOUBLE,
       allowNull: false,
     },
   },
@@ -431,18 +401,27 @@ Alumno.belongsTo(DatosMedicos, { foreignKey: 'idDatoMedico' });
 Alumno.belongsTo(Direccion, { foreignKey: 'idDireccion' });
 Alumno.belongsTo(Escolaridad, { foreignKey: 'idEscolaridad' });
 Alumno.belongsTo(PadreTutor, { foreignKey: 'idTutor' });
-Alumno.belongsTo(Tramites, { foreignKey: 'idTramites' });
+
+Alumno.hasMany(Tramites, { foreignKey: 'idtramite' }); // tabla tramite 
+Alumno.belongsTo(Tramites, { foreignKey: 'idTramite' }); //tabla de alumno
+
 Alumno.belongsTo(EstadoGeneral, { foreignKey: 'idEstadoGeneral' });
 Alumno.belongsTo(DatosAcademicos, { foreignKey: 'idDatoAcademico' });
-Alumno.belongsTo( ingreso , { foreignKey: 'idIngreso' });
+
 
 Grupo.belongsTo( Semestre , { foreignKey: 'id_semestre' });
 Asignaturas.belongsTo( Grupo , { foreignKey: 'id_Grupos' });
 Calificaciones.belongsTo( Asignaturas , { foreignKey: 'id_Asignatura' });
-Carrera.belongsTo( Asignaturas , { foreignKey: 'id_asignaturas' });
+
+Carrera.hasMany(Asignaturas, { foreignKey: 'idalumno' });
+Carrera.belongsTo( Asignaturas , { foreignKey: 'idAsignatura' });
+
 Kardex.belongsTo( Carrera , { foreignKey: 'idCarrera' });
 EstadoGeneral.belongsTo( Carrera , { foreignKey: 'id_carrera' });
-DatosAcademicos.belongsTo( Carrera , { foreignKey: 'idCarrera' });
-DatosAcademicos.belongsTo( Kardex , { foreignKey: 'idKardex' });
 
-export { Semestre, Grupo, Asignaturas, Calificaciones, Carrera, Kardex, EstadoGeneral, DatosAcademicos, Alumno, ingreso };
+DatosAcademicos.belongsTo( Carrera , { foreignKey: 'idCarrera' });
+
+DatosAcademicos.hasMany(Kardex, { foreignKey: 'idkardexs' });
+DatosAcademicos.belongsTo( Kardex , { foreignKey: 'idKardex'});
+
+export { Semestre, Grupo, Asignaturas, Calificaciones, Carrera, Kardex, EstadoGeneral, DatosAcademicos, Alumno};

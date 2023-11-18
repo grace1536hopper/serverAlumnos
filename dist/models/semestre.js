@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ingreso = exports.Alumno = exports.DatosAcademicos = exports.EstadoGeneral = exports.Kardex = exports.Carrera = exports.Calificaciones = exports.Asignaturas = exports.Grupo = exports.Semestre = void 0;
+exports.Alumno = exports.DatosAcademicos = exports.EstadoGeneral = exports.Kardex = exports.Carrera = exports.Calificaciones = exports.Asignaturas = exports.Grupo = exports.Semestre = void 0;
 const { DataTypes, Model } = require('sequelize');
 const datosMedicos_1 = __importDefault(require("./datosMedicos"));
 const direccion_1 = __importDefault(require("./direccion"));
@@ -305,30 +305,6 @@ DatosAcademicos.init({
     createdAt: false,
     updatedAt: false,
 });
-class ingreso extends Model {
-}
-exports.ingreso = ingreso;
-ingreso.init({
-    idIngreso: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        autoIncrement: true,
-    },
-    boleta: {
-        type: DataTypes.DOUBLE,
-        allowNull: false,
-    },
-    contrasena: {
-        type: DataTypes.DOUBLE,
-        allowNull: false,
-    },
-}, {
-    sequelize: connection_1.default,
-    modelName: 'ingreso',
-    createdAt: false,
-    updatedAt: false,
-});
 class Alumno extends Model {
 }
 exports.Alumno = Alumno;
@@ -387,7 +363,7 @@ Alumno.init({
         allowNull: false,
     },
     boleta: {
-        type: DataTypes.STRING,
+        type: DataTypes.DOUBLE,
         allowNull: false,
     },
 }, {
@@ -400,15 +376,17 @@ Alumno.belongsTo(datosMedicos_1.default, { foreignKey: 'idDatoMedico' });
 Alumno.belongsTo(direccion_1.default, { foreignKey: 'idDireccion' });
 Alumno.belongsTo(escolaridad_1.default, { foreignKey: 'idEscolaridad' });
 Alumno.belongsTo(tutor_1.default, { foreignKey: 'idTutor' });
-Alumno.belongsTo(tramites_1.default, { foreignKey: 'idTramites' });
+Alumno.hasMany(tramites_1.default, { foreignKey: 'idtramite' }); // tabla tramite 
+Alumno.belongsTo(tramites_1.default, { foreignKey: 'idTramite' }); //tabla de alumno
 Alumno.belongsTo(EstadoGeneral, { foreignKey: 'idEstadoGeneral' });
 Alumno.belongsTo(DatosAcademicos, { foreignKey: 'idDatoAcademico' });
-Alumno.belongsTo(ingreso, { foreignKey: 'idIngreso' });
 Grupo.belongsTo(Semestre, { foreignKey: 'id_semestre' });
 Asignaturas.belongsTo(Grupo, { foreignKey: 'id_Grupos' });
 Calificaciones.belongsTo(Asignaturas, { foreignKey: 'id_Asignatura' });
-Carrera.belongsTo(Asignaturas, { foreignKey: 'id_asignaturas' });
+Carrera.hasMany(Asignaturas, { foreignKey: 'idalumno' });
+Carrera.belongsTo(Asignaturas, { foreignKey: 'idAsignatura' });
 Kardex.belongsTo(Carrera, { foreignKey: 'idCarrera' });
 EstadoGeneral.belongsTo(Carrera, { foreignKey: 'id_carrera' });
 DatosAcademicos.belongsTo(Carrera, { foreignKey: 'idCarrera' });
+DatosAcademicos.hasMany(Kardex, { foreignKey: 'idkardexs' });
 DatosAcademicos.belongsTo(Kardex, { foreignKey: 'idKardex' });

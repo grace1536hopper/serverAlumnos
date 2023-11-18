@@ -21,5 +21,4 @@ const Grupo = connection_1.default.define('grupos', {
     createdAt: false,
     updatedAt: false
 });
-// Grupo.belongsTo( Semestre , { foreignKey: 'id_semestre' });
 exports.default = Grupo;
