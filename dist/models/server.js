@@ -14,9 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const alumnos_1 = __importDefault(require("../routes/alumnos"));
+const auth_1 = __importDefault(require("../routes/auth"));
 const connection_1 = __importDefault(require("../db/connection"));
+const cors_1 = __importDefault(require("cors"));
+const auth_2 = require("../controllers/auth");
 class Server {
     constructor() {
+        console.log(process.env.PORT);
         this.app = (0, express_1.default)();
         this.port = process.env.PORT || '3001';
         this.listen();
@@ -36,11 +40,14 @@ class Server {
             });
         });
         this.app.use('/api/alumnos', alumnos_1.default);
+        this.app.use('/api/login', auth_1.default);
+        this.app.use('/api/login/renew', auth_2.renewToken);
         // this.app.use('/api/datosmedicos', routerDatosmedicos)
     }
     midlewares() {
         //parseamos el body
         this.app.use(express_1.default.json());
+        this.app.use((0, cors_1.default)()); // esta se la agrego al codigo 
     }
     dbConnect() {
         return __awaiter(this, void 0, void 0, function* () {

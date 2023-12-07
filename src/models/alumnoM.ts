@@ -5,9 +5,41 @@ import Direccion from './direccion';
 import Escolaridad from './escolaridad'
 import PadreTutor from './tutor';
 import Tramites from './tramites';
-import { DatosAcademicos, EstadoGeneral } from './semestre';
 
+class Ingreso extends Model {}
+Ingreso.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    boleta: {
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+    },
+    contrasena: {
+      type: DataTypes.STRING(10), // Assuming you want a maximum length of 10 characters for the password
+      allowNull: false,
+    },
+    id_alumnos: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'ingreso', // Assuming you reference the same table
+        key: 'id_Alumnos',
+      },
+    },
+  },
+  {
+    sequelize: db,
+    modelName: 'ingreso',
+    createdAt: false,
+    updatedAt: false,
+  }
+);
  
+
 class Alumno extends Model {}
 
 Alumno.init(
@@ -84,5 +116,9 @@ Alumno.belongsTo(Escolaridad, { foreignKey: 'idEscolaridad' });
 Alumno.belongsTo(PadreTutor, { foreignKey: 'idTutor' });
 Alumno.belongsTo(Tramites, { foreignKey: 'idTramites' });
 
+Ingreso.belongsTo(Alumno, { foreignKey: 'id_alumno' });
 
-export default Alumno;
+
+
+
+export {Alumno, Ingreso};

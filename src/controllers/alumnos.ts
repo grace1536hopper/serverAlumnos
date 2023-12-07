@@ -5,15 +5,16 @@ import Direccion from "../models/direccion"
 import Escolaridad from "../models/escolaridad"
 import PadreTutor from "../models/tutor"
 import Tramites from "../models/tramites"
-import { Semestre, Grupo, Asignaturas, Calificaciones, Carrera, Kardex, EstadoGeneral, DatosAcademicos, Alumno} from '../models/semestre';
+import { Semestre, Grupo, Asignaturas, Calificaciones, Carrera, Kardex, EstadoGeneral, DatosAcademicos, Alumno, Ingreso} from '../models/semestre';
 import { Model } from "sequelize"
+import { generarJWT } from "../helpers/jwt"
 
 // import Direccion from '../models/direccion';
 
 
 
 export const getAlumnos = async (req:Request, res:Response) =>{
-    const listAlumnos = await Alumno.findAll()
+    const listAlumnos = await Ingreso.findAll()
     res.json({
         listAlumnos
     })
@@ -74,67 +75,35 @@ export const getAlumnos = async (req:Request, res:Response) =>{
 //   }
 // }
 
-export const getAlumno = async (req: Request, res: Response) => {
+export const getAlumno = async (req: any, res: Response) => {
   try {
     const { id } = req.params;
-    const usuario = await Alumno.findByPk(id, {
+    const ingreso = await Ingreso.findByPk(id, {
       include: [
-        { model: DatosMedicos },
-        { model: Direccion },
-        { model: Escolaridad },
-        { model: PadreTutor },
-        
-        { model: EstadoGeneral, include: [
-            {
-               model: Carrera ,
-              include: [
-                { model: Asignaturas, include: [
-                    {
-                      model: Grupo, include: [
-                        {
-                          model: Semestre,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        { model: DatosAcademicos, include: [            
-            { model: Kardex },
-            { model: Carrera },
-          ],
-        },
-      ],
+        { model: Alumno, as: 'alumno' } // Assuming you have set an alias 'alumno' for the association in the model
+      ]
     });
 
-    if (usuario) {
-      const tramites = await usuario.getTramites();
-      usuario.setDataValue('Tramites', tramites);
-    
-      const datosAcademicos = await DatosAcademicos.findByPk(id);
-      const kardexes = await datosAcademicos.getKardexes();
-      datosAcademicos.setDataValue('Kardexes', kardexes);
-
-      const carreras = await Carrera.findByPk(id); //Suponiendo que Carrera está asociada directamente con EstadoGeneral
-      const asignaturas = await carreras.getAsignaturas();
-      carreras.setDataValue('Asignaturas', asignaturas);
-
-      res.json(usuario);
-    }  else {
-      res.status(404).json({
-        msg: `No existe el usuario con el id ${id}`,
+    if (!ingreso) {
+      return res.status(404).json({
+        msg: 'Ingreso not found',
       });
     }
+
+    res.json({
+      ingreso,
+      uid: req.uid // se tiene el uid del usuario que hizo la peticion 
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      msg: 'Ocurrió un error, comuníquese con soporte',
+      msg: 'An error occurred, please contact support',
     });
   }
 };
+
+
+
 
 
 export const deletAlumno = async (req:Request, res:Response) =>{
@@ -195,10 +164,5 @@ export const updateAlumno = async (req:Request, res:Response) =>{
         res.json({
             msg:`Ocurrio un error, comuniquese con soporte `
         })
-    }
-    
-    
-
-
-    
+    }   
 }

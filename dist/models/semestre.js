@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Alumno = exports.DatosAcademicos = exports.EstadoGeneral = exports.Kardex = exports.Carrera = exports.Calificaciones = exports.Asignaturas = exports.Grupo = exports.Semestre = void 0;
+exports.Ingreso = exports.Alumno = exports.DatosAcademicos = exports.EstadoGeneral = exports.Kardex = exports.Carrera = exports.Calificaciones = exports.Asignaturas = exports.Grupo = exports.Semestre = void 0;
 const { DataTypes, Model } = require('sequelize');
 const datosMedicos_1 = __importDefault(require("./datosMedicos"));
 const direccion_1 = __importDefault(require("./direccion"));
@@ -188,7 +188,7 @@ Kardex.init({
         allowNull: false,
     },
     fecha: {
-        type: DataTypes.DATE,
+        type: DataTypes.STRING(15),
         allowNull: false,
     },
     periodo: {
@@ -236,11 +236,11 @@ EstadoGeneral.init({
         allowNull: false,
     },
     fechaInscripcion: {
-        type: DataTypes.DATE,
+        type: DataTypes.STRING(15),
         allowNull: false,
     },
     fechaFinalizacion: {
-        type: DataTypes.DATE,
+        type: DataTypes.STRING(15),
         allowNull: false,
     },
     turno: {
@@ -372,6 +372,38 @@ Alumno.init({
     createdAt: false,
     updatedAt: false,
 });
+class Ingreso extends Model {
+}
+exports.Ingreso = Ingreso;
+Ingreso.init({
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    boleta: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+    },
+    contrasena: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+    },
+    id_alumnos: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'Alumno',
+            key: 'id_alumnos',
+        },
+    },
+}, {
+    sequelize: connection_1.default,
+    modelName: 'ingresos',
+    createdAt: false,
+    updatedAt: false,
+});
+Ingreso.belongsTo(Alumno, { foreignKey: 'id_alumnos' });
 Alumno.belongsTo(datosMedicos_1.default, { foreignKey: 'idDatoMedico' });
 Alumno.belongsTo(direccion_1.default, { foreignKey: 'idDireccion' });
 Alumno.belongsTo(escolaridad_1.default, { foreignKey: 'idEscolaridad' });

@@ -1,7 +1,9 @@
-import Server from "./models/server";
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
-//se configura las variables de ambiente 
-dotenv.config();
+import Server from "./models/server";
+import path from 'path';
+
+const envPath = path.join(__dirname, '../.env');
+dotenv.config({ path: envPath });
 
 const server = new Server();

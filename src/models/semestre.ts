@@ -201,7 +201,7 @@ Kardex.init(
       allowNull: false,
     },
     fecha: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING(15),
       allowNull: false,
     },
     periodo: {
@@ -252,11 +252,11 @@ EstadoGeneral.init(
       allowNull: false,
     },
     fechaInscripcion: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING(15),
       allowNull: false,
     },
     fechaFinalizacion: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING(15),
       allowNull: false,
     },
     turno: {
@@ -397,6 +397,41 @@ Alumno.init(
   }
 );
 
+class Ingreso extends Model {}
+Ingreso.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    boleta: {
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+    },
+    contrasena: {
+      type: DataTypes.STRING(10), // Assuming you want a maximum length of 10 characters for the password
+      allowNull: false,
+    },
+    id_alumnos: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'Alumno', // Assuming you reference the same table
+        key: 'id_alumnos',
+      },
+    },
+  },
+  {
+    sequelize: db,
+    modelName: 'ingresos',
+    createdAt: false,
+    updatedAt: false,
+  }
+);
+
+Ingreso.belongsTo(Alumno, { foreignKey: 'id_alumnos' });
+
 Alumno.belongsTo(DatosMedicos, { foreignKey: 'idDatoMedico' });
 Alumno.belongsTo(Direccion, { foreignKey: 'idDireccion' });
 Alumno.belongsTo(Escolaridad, { foreignKey: 'idEscolaridad' });
@@ -424,4 +459,4 @@ DatosAcademicos.belongsTo( Carrera , { foreignKey: 'idCarrera' });
 DatosAcademicos.hasMany(Kardex, { foreignKey: 'idkardexs' });
 DatosAcademicos.belongsTo( Kardex , { foreignKey: 'idKardex'});
 
-export { Semestre, Grupo, Asignaturas, Calificaciones, Carrera, Kardex, EstadoGeneral, DatosAcademicos, Alumno};
+export { Semestre, Grupo, Asignaturas, Calificaciones, Carrera, Kardex, EstadoGeneral, DatosAcademicos, Alumno, Ingreso};

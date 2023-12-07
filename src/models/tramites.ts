@@ -17,7 +17,7 @@ const Tramites = db.define('tramites', {
         allowNull: false,
       },
       fechaSolicitud: {
-        type: DataTypes.DATE,
+        type: DataTypes.STRING(15),
         allowNull: true, // Puedes cambiar a false si se requiere que siempre haya una fecha de solicitud
     },
     descripcion: {

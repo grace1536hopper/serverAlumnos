@@ -1,7 +1,11 @@
 import express, {Application, Request, Response} from 'express'
 import routesAlumnos from '../routes/alumnos'
+import auth from '../routes/auth'
 import routerDatosmedicos from '../routes/datosMedicos';
 import db from '../db/connection';
+import cors from 'cors';
+import { renewToken } from '../controllers/auth';
+
 
 class Server{
 
@@ -9,7 +13,7 @@ class Server{
     private port: string;
 
     constructor(){
-      
+        console.log(process.env.PORT);
         this.app = express();
         this.port = process.env.PORT || '3001';
         this.listen();
@@ -31,13 +35,17 @@ class Server{
                 msg: 'api router'
             });
         });
-         this.app.use('/api/alumnos', routesAlumnos)
+         this.app.use('/api/alumnos', routesAlumnos);
+         this.app.use('/api/login', auth);
+         this.app.use('/api/login/renew', renewToken);
         // this.app.use('/api/datosmedicos', routerDatosmedicos)
     }
 
     midlewares(){
         //parseamos el body
         this.app.use(express.json());
+
+        this.app.use(cors()); // esta se la agrego al codigo 
     }
 
     async dbConnect(){

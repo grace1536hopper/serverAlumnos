@@ -8,20 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateAlumno = exports.postAlumno = exports.deletAlumno = exports.getAlumno = exports.getAlumnos = void 0;
-// import Alumno from "../models/alumnoM"
-const datosMedicos_1 = __importDefault(require("../models/datosMedicos"));
-const direccion_1 = __importDefault(require("../models/direccion"));
-const escolaridad_1 = __importDefault(require("../models/escolaridad"));
-const tutor_1 = __importDefault(require("../models/tutor"));
 const semestre_1 = require("../models/semestre");
 // import Direccion from '../models/direccion';
 const getAlumnos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const listAlumnos = yield semestre_1.Alumno.findAll();
+    const listAlumnos = yield semestre_1.Ingreso.findAll();
     res.json({
         listAlumnos
     });
@@ -80,58 +72,25 @@ exports.getAlumnos = getAlumnos;
 const getAlumno = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const usuario = yield semestre_1.Alumno.findByPk(id, {
+        const ingreso = yield semestre_1.Ingreso.findByPk(id, {
             include: [
-                { model: datosMedicos_1.default },
-                { model: direccion_1.default },
-                { model: escolaridad_1.default },
-                { model: tutor_1.default },
-                { model: semestre_1.EstadoGeneral, include: [
-                        {
-                            model: semestre_1.Carrera,
-                            include: [
-                                { model: semestre_1.Asignaturas, include: [
-                                        {
-                                            model: semestre_1.Grupo, include: [
-                                                {
-                                                    model: semestre_1.Semestre,
-                                                },
-                                            ],
-                                        },
-                                    ],
-                                },
-                            ],
-                        },
-                    ],
-                },
-                { model: semestre_1.DatosAcademicos, include: [
-                        { model: semestre_1.Kardex },
-                        { model: semestre_1.Carrera },
-                    ],
-                },
-            ],
+                { model: semestre_1.Alumno, as: 'alumno' } // Assuming you have set an alias 'alumno' for the association in the model
+            ]
         });
-        if (usuario) {
-            const tramites = yield usuario.getTramites();
-            usuario.setDataValue('Tramites', tramites);
-            const datosAcademicos = yield semestre_1.DatosAcademicos.findByPk(id);
-            const kardexes = yield datosAcademicos.getKardexes();
-            datosAcademicos.setDataValue('Kardexes', kardexes);
-            const carreras = yield semestre_1.Carrera.findByPk(id); //Suponiendo que Carrera está asociada directamente con EstadoGeneral
-            const asignaturas = yield carreras.getAsignaturas();
-            carreras.setDataValue('Asignaturas', asignaturas);
-            res.json(usuario);
-        }
-        else {
-            res.status(404).json({
-                msg: `No existe el usuario con el id ${id}`,
+        if (!ingreso) {
+            return res.status(404).json({
+                msg: 'Ingreso not found',
             });
         }
+        res.json({
+            ingreso,
+            uid: req.uid // se tiene el uid del usuario que hizo la peticion 
+        });
     }
     catch (error) {
         console.error(error);
         res.status(500).json({
-            msg: 'Ocurrió un error, comuníquese con soporte',
+            msg: 'An error occurred, please contact support',
         });
     }
 });
