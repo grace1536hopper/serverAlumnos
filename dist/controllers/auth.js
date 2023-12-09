@@ -75,10 +75,17 @@ const Credencial = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.Credencial = Credencial;
 const renewToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const uid = req.uid;
+    const { id } = req.params;
+    const ingreso = yield semestre_1.Ingreso.findByPk(id, {
+        include: [
+            { model: semestre_1.Alumno, as: 'alumno' } // Assuming you have set an alias 'alumno' for the association in the model
+        ]
+    });
     // generar el TOKEN - JWT
     const token = yield (0, jwt_1.generarJWT)(uid);
     res.json({
         ok: 'true',
+        // uid: req.uid 
         token
     });
 });

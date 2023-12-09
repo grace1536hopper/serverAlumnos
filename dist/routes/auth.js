@@ -11,5 +11,6 @@ router.post('/', [
     (0, express_validator_1.check)('contrasena', 'La contraseña es obligatoria').not().isEmpty(),
     validar_campos_1.validarCampos,
 ], auth_1.Credencial);
-router.get('/', validar_jwt_1.validarJWT, auth_1.renewToken);
+//router.get( '/', validarJWT,renewToken);
+router.get('/renew', validar_jwt_1.validarJWT, auth_1.renewToken);
 exports.default = router;

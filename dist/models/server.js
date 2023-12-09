@@ -17,7 +17,6 @@ const alumnos_1 = __importDefault(require("../routes/alumnos"));
 const auth_1 = __importDefault(require("../routes/auth"));
 const connection_1 = __importDefault(require("../db/connection"));
 const cors_1 = __importDefault(require("cors"));
-const auth_2 = require("../controllers/auth");
 class Server {
     constructor() {
         console.log(process.env.PORT);
@@ -41,7 +40,7 @@ class Server {
         });
         this.app.use('/api/alumnos', alumnos_1.default);
         this.app.use('/api/login', auth_1.default);
-        this.app.use('/api/login/renew', auth_2.renewToken);
+        this.app.use('/api/login', auth_1.default); // esta si se utiliza 
         // this.app.use('/api/datosmedicos', routerDatosmedicos)
     }
     midlewares() {
