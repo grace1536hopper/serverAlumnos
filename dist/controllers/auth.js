@@ -32,11 +32,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.renewToken = exports.Credencial = void 0;
 const semestre_1 = require("../models/semestre");
 const jwt_1 = require("../helpers/jwt");
 const bcrypt = __importStar(require("bcryptjs"));
+const direccion_1 = __importDefault(require("../models/direccion"));
+const datosMedicos_1 = __importDefault(require("../models/datosMedicos"));
+const escolaridad_1 = __importDefault(require("../models/escolaridad"));
+const tutor_1 = __importDefault(require("../models/tutor"));
+const tramites_1 = __importDefault(require("../models/tramites"));
 // Suponiendo que tienes una columna "boleta" y "contrasena" en tu modelo de Ingreso
 const Credencial = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -45,7 +53,94 @@ const Credencial = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const ingreso = yield semestre_1.Ingreso.findOne({
             where: { boleta, contrasena },
             include: [
-                { model: semestre_1.Alumno, as: 'alumno' }
+                { model: semestre_1.Alumno, as: 'alumno',
+                    include: [{
+                            model: direccion_1.default,
+                            as: 'direccion'
+                        }, {
+                            model: datosMedicos_1.default,
+                            as: 'datosmedico'
+                        }, {
+                            model: escolaridad_1.default,
+                            as: 'escolaridad'
+                        }, {
+                            model: tutor_1.default,
+                            as: 'padretutor'
+                        }, {
+                            model: tramites_1.default,
+                            as: 'tramites'
+                        }, {
+                            model: semestre_1.EstadoGeneral,
+                            as: 'estadog',
+                            include: [
+                                {
+                                    model: semestre_1.Carrera,
+                                    as: 'carrera',
+                                    include: [
+                                        {
+                                            model: semestre_1.Asignaturas,
+                                            as: 'asignatura',
+                                            include: [
+                                                {
+                                                    model: semestre_1.Grupo,
+                                                    as: 'grupo',
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            model: semestre_1.DatosAcademicos,
+                            as: 'datosacademico',
+                            include: [
+                                {
+                                    model: semestre_1.Carrera,
+                                    as: 'carrera',
+                                    include: [
+                                        {
+                                            model: semestre_1.Asignaturas,
+                                            as: 'asignatura',
+                                            include: [
+                                                {
+                                                    model: semestre_1.Grupo,
+                                                    as: 'grupo',
+                                                    include: [
+                                                        {
+                                                            model: semestre_1.Semestre,
+                                                            as: 'semestre',
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }, {
+                                    model: semestre_1.Kardex,
+                                    as: 'kardexes',
+                                    include: [
+                                        {
+                                            model: semestre_1.Carrera,
+                                            as: 'carrera',
+                                            include: [
+                                                {
+                                                    model: semestre_1.Asignaturas,
+                                                    as: 'asignatura',
+                                                    include: [
+                                                        {
+                                                            model: semestre_1.Grupo,
+                                                            as: 'grupo',
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ] },
             ]
         });
         //encriptar la contraseña 
