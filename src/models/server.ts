@@ -37,7 +37,8 @@ class Server{
         });
          this.app.use('/api/alumnos', routesAlumnos);
          this.app.use('/api/login', auth);
-         this.app.use('/api/login/renew', renewToken);
+         this.app.use('/api/login', auth); // esta si se utiliza 
+
         // this.app.use('/api/datosmedicos', routerDatosmedicos)
     }
 

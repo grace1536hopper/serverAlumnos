@@ -1,9 +1,16 @@
 //Esta es para el ingreso a la plataforma 
 
 import { Request, Response } from "express"
-import { Alumno, Ingreso } from "../models/semestre";
+import { Alumno, Asignaturas, Carrera, DatosAcademicos, EstadoGeneral, Grupo, Ingreso, Kardex, Semestre } from "../models/semestre";
 import { generarJWT } from "../helpers/jwt";
 import * as bcrypt from "bcryptjs"; 
+import { Model } from 'sequelize';
+import Direcciones from "../models/direccion";
+import DatosMedicos from "../models/datosMedicos";
+import Escolaridad from "../models/escolaridad";
+import PadreTutor from "../models/tutor";
+import Tramites from "../models/tramites";
+
 
 // Suponiendo que tienes una columna "boleta" y "contrasena" en tu modelo de Ingreso
 export const Credencial = async (req: Request, res: Response) => {
@@ -14,7 +21,97 @@ export const Credencial = async (req: Request, res: Response) => {
     const ingreso = await Ingreso.findOne({
       where: { boleta, contrasena },
       include: [
-        { model: Alumno, as: 'alumno' }
+        { model: Alumno, as: 'alumno',
+         include: [{
+          model: Direcciones, 
+          as: 'direccion'
+        },{
+          model: DatosMedicos, 
+          as: 'datosmedico' 
+        },{
+          model: Escolaridad, 
+          as: 'escolaridad' 
+        },{
+          model: PadreTutor, 
+          as: 'padretutor' 
+        },{
+          model: Tramites,
+          as: 'tramite' 
+        },{
+          model: EstadoGeneral, 
+          as: 'estadog', 
+          include: [
+            {
+              model: Carrera,
+              as: 'carrera',
+              include: [
+                {
+                  model: Asignaturas,
+                  as: 'asignatura',
+                  include: [
+                    {
+                      model: Grupo,
+                      as: 'grupo',
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          model: DatosAcademicos, 
+          as: 'datosacademico',
+          include: [
+            {
+              model: Carrera,
+              as: 'carrera',
+              include: [
+                {
+                  model: Asignaturas,
+                  as: 'asignatura',
+                  include: [
+                    {
+                      model: Grupo,
+                      as: 'grupo',
+                      include: [
+                        {
+                          model: Semestre,
+                          as: 'semestre',
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },{
+              model:Kardex,
+              as: 'kardexes',
+              include: [
+                {
+                  model: Carrera,
+                  as: 'carrera',
+                  include: [
+                    {
+                      model: Asignaturas,
+                      as: 'asignatura',
+                      include: [
+                        {
+                          model: Grupo,
+                          as: 'grupo',
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+
+
+        ]},
+        
       ]
     });
 
@@ -48,12 +145,20 @@ export const Credencial = async (req: Request, res: Response) => {
 
 export const renewToken = async(req: any, res: Response) =>{
   const uid = req.uid;
-    
+  const { id } = req.params;
+  const ingreso = await Ingreso.findByPk(id, {
+    include: [
+      { model: Alumno, as: 'alumno' } // Assuming you have set an alias 'alumno' for the association in the model
+    ]
+  });
   // generar el TOKEN - JWT
   const token = await generarJWT(uid);
-
+  
   res.json({
       ok:'true',
+      // uid: req.uid 
       token
   });
 }
+
+

@@ -68,7 +68,7 @@ const Credencial = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                             as: 'padretutor'
                         }, {
                             model: tramites_1.default,
-                            as: 'tramites'
+                            as: 'tramite'
                         }, {
                             model: semestre_1.EstadoGeneral,
                             as: 'estadog',

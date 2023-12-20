@@ -15,6 +15,8 @@ router.post('/',
     Credencial
 )
 
-router.get( '/', validarJWT,renewToken);
+//router.get( '/', validarJWT,renewToken);
+
+router.get( '/renew', validarJWT, renewToken);
 
 export default router;
